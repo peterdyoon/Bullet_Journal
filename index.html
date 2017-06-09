@@ -45,22 +45,15 @@
 
     <div class="container" ng-controller = 'myController'>
         <br><br><br>
-        <div class="row">
         <div class="col-xs-6">
+        <div class="col-xs-12">
            <div class="form-group">
                 <label for="filter">Search:</label>
                 <input type="text" class="form-control" placeholder="Filter Bullet Journal" ng-model="myfilter">
             </div>
             <button class='btn btn-success' ng-click='createNewBullet();'>Create New Bullet</button>
         </div>
-        <div class="col-xs-6">
-           <div class="form-group">
-                <label for="filter">Search:</label>
-                <input type="text" class="form-control" placeholder="Filter Pending Journal" ng-model="mypendingfilter">
-            </div>
-        </div>
-        </div>
-        <div class="col-xs-6">
+        <div class="col-xs-12">
             <h1>Bullet Journal</h1>
             <div ng-repeat = 'label in priorityList'>
                 <h3>{{label.name}}</h3>
@@ -82,8 +75,16 @@
                 </div>
             </div>
         </div>
+        </div>
         <div class="col-xs-6">
+           <div class="col-xs-12">
+           <div class="form-group">
+                <label for="filter">Search:</label>
+                <input type="text" class="form-control" placeholder="Filter Pending Journal" ng-model="mypendingfilter">
+            </div>
+        </div>
             <h1>Pending</h1>
+            <h3></h3>
             <div class="input-group" ng-repeat = 'bullet in userData | filter: {complete : true} | filter: {description : mypendingfilter} | orderBy : "timeCompleted"'>
                 <span class="input-group-addon">
                 <input type="checkbox" aria-label="..." ng-model = 'bullet.complete' ng-change = 'bullet.newTimeStamp(); saveBullet(bullet)'>
