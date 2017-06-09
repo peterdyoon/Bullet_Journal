@@ -11,7 +11,64 @@ var database = firebase.database();
 
 var app = angular.module('MyApp', ['firebase', 'ngRoute']);
 
-app.controller('myController', ['$scope', '$firebaseArray', '$interval', function ($scope, $firebaseArray, $interval) {
+app.config(['$routeProvider', '$locationProvider', function
+    ($routeProvider, $locationProvider) {
+        $routeProvider.when("/bullet", {
+            controller: "myController",
+            templateUrl: "Templates/bullet.html",
+            resolve: {
+                "currentAuth": ["Auth", function(Auth) {
+                    return Auth.$requireSignIn();
+                }]
+            }
+        }).when("/pending", {
+            controller: "myController",
+            templateUrl: "Templates/pending.html",
+            resolve: {
+                "currentAuth": ["Auth", function(Auth) {
+                    return Auth.$requireSignIn();
+                }]
+            }
+        }).when("/archives", {
+            controller: "myController",
+            templateUrl: "Templates/archives.html", 
+            resolve: {
+                "currentAuth": ["Auth", function(Auth) {
+                    return Auth.$requireSignIn();
+                }]
+            }
+        })
+}]);
+
+app.controller("myNavController", ['$scope', function ($scope) {
+    $scope.tab = 0;
+    $scope.selectTab = function (newTab) {
+        $scope.tab = newTab;
+    };
+}]);
+
+app.factory("Auth", ["$firebaseAuth",
+  function ($firebaseAuth) {
+        return $firebaseAuth();
+  }
+]);
+app.controller("MyAuthCtrl", ["$scope", "Auth", "$firebaseArray", function ($scope, Auth, $firebaseArray) {
+    $scope.auth = Auth;
+    $scope.name = '';
+    $scope.user = '';
+    $scope.auth.$onAuthStateChanged(function (firebaseUser) {
+        $scope.firebaseUser = firebaseUser;
+    });
+    $scope.signinGoogle = function () {
+        $scope.auth.$signInWithPopup("google").then(function (result) {
+            console.log("Signed in as:", result.user.uid);
+        }).catch(function (error) {
+            console.error("Authentication failed:", error);
+        });
+    }
+}]);
+app.controller('myController', ['$scope', '$firebaseArray', '$interval', 'Auth', "currentAuth", function ($scope, $firebaseArray, $interval, Auth, currentAuth) {
+    $scope.currentUser = currentAuth;
     $scope.userData = $firebaseArray(database.ref('/users/peteyoon14'));
     $scope.userData.$loaded().then(function (result) {
         for (var i = 0; i < $scope.userData.length; i++) {
