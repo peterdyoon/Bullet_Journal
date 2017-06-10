@@ -2,25 +2,41 @@
     <div class="form-group">
         <label for="filter">Search:</label>
         <input type="text" class="form-control" placeholder="Filter Bullet Journal" ng-model="myfilter">
+        <input type="text" class="form-control" placeholder="Filter Project" ng-model="myprojectfilter">
     </div>
+    
     <button class='btn btn-success' ng-click='createNewBullet();'>Create New Bullet</button>
     <h1>Bullet Journal</h1>
     <div ng-repeat='label in priorityList'>
         <h3>{{label.name}}</h3>
-        <div class="input-group" ng-repeat='bullet in userData | filter: {complete : false} | filter: {description : myfilter} | filter: {priority : label.priority}'>
-            <span class="input-group-addon">
-                    <input type="checkbox" aria-label="..." ng-model = 'bullet.complete' ng-change = 'bullet.newTimeStamp(); saveBullet(bullet)'>
-                    </span>
-            <input type="text" class="form-control" aria-label="..." ng-model='bullet.description' ng-change='saveBullet(bullet)'>
-            <div class="input-group-btn">
-                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{(clock - bullet.timeCompleted)/1000/60 | number:0}}<span class="caret"></span></button>
-                <ul class="dropdown-menu dropdown-menu-right">
-                    <li ng-click='bullet.priorityEdit(1); saveBullet(bullet)'><a>Due Today</a></li>
-                    <li ng-click='bullet.priorityEdit(2); saveBullet(bullet)'><a>Errands</a></li>
-                    <li ng-click='bullet.priorityEdit(3); saveBullet(bullet)'><a>Brainstorm</a></li>
-                    <li role="separator" class="divider"></li>
-                    <li ng-click='deleteBullet(bullet)'><a>Delete</a></li>
-                </ul>
+        <div ng-repeat='bullet in userData | filter: {complete : false} | filter: {description : myfilter} | filter: {project : myprojectfilter} | filter: {priority : label.priority} | orderBy : "timeCompleted"' >
+          <div class="row">
+           <div class = 'col-xs-3 remove-padding'>
+             <div class="input-group">
+              <span class="input-group-addon">
+                <input type="checkbox" aria-label="..." ng-model = 'bullet.complete' ng-change = 'bullet.newTimeStamp(); saveBullet(bullet)'>
+                </span>
+               <input type="text" class = 'form-control' aria-label="..." ng-model='bullet.project' ng-change='saveBullet(bullet)' id = 'remove-right-border-radius'>
+               </div>
+           </div>
+            <div class = "col-xs-9 remove-padding">
+               <div class="input-group">
+                <input type="text" class="form-control" aria-label="..." ng-model='bullet.description' ng-change='saveBullet(bullet)' id = 'remove-left-border-radius'>
+                <div class="input-group-btn">
+                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span ng-show = 'loaded'>{{(clock - bullet.timeCompleted)/1000/60/60 | number:1}}</span><span class="caret"></span></button>
+                    <ul class="dropdown-menu dropdown-menu-right">
+                        <li ng-click='bullet.priorityEdit(1); saveBullet(bullet)'><a>Due Today</a></li>
+                        <li ng-click='bullet.priorityEdit(2); saveBullet(bullet)'><a>Errands</a></li>
+                        <li ng-click='bullet.priorityEdit(3); saveBullet(bullet)'><a>Brainstorm</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li ng-click='bullet.priorityEdit(3); saveBullet(bullet)'><a>Reset Timer</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li ng-click='archiveBullet(bullet)'><a>Archive</a></li>
+                        <li ng-click='deleteBullet(bullet)'><a>Delete</a></li>
+                    </ul>
+                </div>
+                </div>
+            </div>
             </div>
         </div>
     </div>

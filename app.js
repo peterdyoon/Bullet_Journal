@@ -68,8 +68,17 @@ app.controller("MyAuthCtrl", ["$scope", "Auth", "$firebaseArray", function ($sco
     }
 }]);
 app.controller('myController', ['$scope', '$firebaseArray', '$interval', 'Auth', "currentAuth", function ($scope, $firebaseArray, $interval, Auth, currentAuth) {
+    $scope.clock = "";
+    $scope.callAtInterval = function() {
+        $scope.clock = Date.now();
+        $scope.loaded = true;
+    }
+    $interval( function(){
+        $scope.callAtInterval();
+    }, 1000);
     $scope.currentUser = currentAuth;
-    $scope.userData = $firebaseArray(database.ref('/users/peteyoon14'));
+    $scope.userArchive = $firebaseArray(database.ref('/users/peteyoon14/archive'));
+    $scope.userData = $firebaseArray(database.ref('/users/peteyoon14/bullet'));
     $scope.userData.$loaded().then(function (result) {
         for (var i = 0; i < $scope.userData.length; i++) {
             $scope.userData[i].__proto__ = BulletRecord.prototype;
@@ -79,6 +88,7 @@ app.controller('myController', ['$scope', '$firebaseArray', '$interval', 'Auth',
     });
     $scope.myfilter = '';
     $scope.mypendingfilter = '';
+    $scope.loaded = false;
     $scope.priorityList = [
         {
             name: '',
@@ -98,7 +108,9 @@ app.controller('myController', ['$scope', '$firebaseArray', '$interval', 'Auth',
         }, 
     ];
     $scope.createNewBullet = function() {
-        $scope.userData.$add(new BulletRecord());
+        $scope.userData.$add(new BulletRecord()).then(function(ref) {
+            $scope.userData[$scope.userData.$indexFor(ref.key)].__proto__ = BulletRecord.prototype;
+        });
         return false;
     }
     $scope.saveBullet = function(bullet) {
@@ -109,20 +121,20 @@ app.controller('myController', ['$scope', '$firebaseArray', '$interval', 'Auth',
         $scope.userData.$remove(bullet);
         return false;
     }
-    $scope.clock = "";
-    $scope.callAtInterval = function() {
-        $scope.clock = Date.now();
+    $scope.archiveBullet = function(bullet) {
+        $scope.userArchive.$add(bullet).then(function(ref) {
+            $scope.userArchive[$scope.userData.$indexFor(ref.key)].__proto__ = BulletRecord.prototype;
+        });
+        $scope.userData.$remove(bullet);
+        return false;
     }
-    $interval( function(){
-        $scope.callAtInterval();
-    }, 1000);
 }]);
 
 function BulletRecord() {
     this.description = '';
     this.priority = 4;
     this.priorityLabel = 'Due Today';
-    this.category = '';
+    this.project = '';
     this.complete = false;
     this.timestamp = '';
     this.timeCompleted = new Date().getTime();
