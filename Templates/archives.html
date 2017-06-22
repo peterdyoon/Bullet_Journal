@@ -1,0 +1,39 @@
+<div class="col-xs-12 col-sm-6">
+    <div class="form-group">
+        <label for="filter">Search:</label>
+        <input type="text" class="form-control" placeholder="Filter Pending Journal" ng-model="mypendingfilter">
+        <input type="text" class="form-control" placeholder="Filter Project" ng-model="myprojectfilter">
+    </div>
+    <h1>Archives</h1>
+    <h3></h3>
+    <div ng-repeat='bullet in userArchive | filter: {description : mypendingfilter} | filter: {project : myprojectfilter} | orderBy : "timeCompleted"'>
+        <div class="row">
+           <div class = 'col-xs-3 remove-padding'>
+             <div class="input-group">
+              <span class="input-group-addon">
+                <input type="checkbox" aria-label="..." ng-model = 'bullet.complete' ng-change = 'bullet.newTimeStamp(); saveBullet(bullet)'>
+                </span>
+               <input type="text" class = 'form-control' aria-label="..." ng-model='bullet.project' ng-change='saveBullet(bullet)' id = 'remove-right-border-radius'>
+               </div>
+           </div>
+            <div class = "col-xs-9 remove-padding">
+               <div class="input-group">
+                <input type="text" class="form-control" aria-label="..." ng-model='bullet.description' ng-change='saveBullet(bullet)' id = 'remove-left-border-radius'>
+                <div class="input-group-btn">
+                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span ng-show = 'loaded'>{{(clock - bullet.timeCompleted)/1000/60/60 | number:1}}</span><span class="caret"></span></button>
+                    <ul class="dropdown-menu dropdown-menu-right">
+                        <li ng-click='bullet.priorityEdit(1); saveBullet(bullet)'><a>Due Today</a></li>
+                        <li ng-click='bullet.priorityEdit(2); saveBullet(bullet)'><a>Errands</a></li>
+                        <li ng-click='bullet.priorityEdit(3); saveBullet(bullet)'><a>Brainstorm</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li ng-click='bullet.newTimeStamp(); saveBullet(bullet)'><a>Reset Timer</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li ng-click='archiveBullet(bullet)'><a>Archive</a></li>
+                        <li ng-click='deleteBullet(bullet)'><a>Delete</a></li>
+                    </ul>
+                </div>
+                </div>
+            </div>
+            </div>
+    </div>
+</div>

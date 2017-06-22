@@ -68,6 +68,25 @@ app.controller("MyAuthCtrl", ["$scope", "Auth", "$firebaseArray", function ($sco
     }
 }]);
 app.controller('myController', ['$scope', '$firebaseArray', '$interval', 'Auth', "currentAuth", function ($scope, $firebaseArray, $interval, Auth, currentAuth) {
+    $scope.width = 600;
+    $scope.height = 450;
+    $scope.projectNames = [" NONE"];
+    $scope.makeTaller = function() {
+        $scope.height = $scope.height + 40;
+        return false;
+    }
+    $scope.makeShorter = function() {
+        $scope.height = $scope.height - 40;
+        return false;
+    }
+    $scope.makeWider = function() {
+        $scope.width = $scope.width + 40;
+        return false;
+    }
+    $scope.makeThinner = function() {
+        $scope.width = $scope.width - 40;
+        return false;
+    }
     $scope.clock = "";
     $scope.callAtInterval = function() {
         $scope.clock = Date.now();
@@ -82,6 +101,17 @@ app.controller('myController', ['$scope', '$firebaseArray', '$interval', 'Auth',
     $scope.userData.$loaded().then(function (result) {
         for (var i = 0; i < $scope.userData.length; i++) {
             $scope.userData[i].__proto__ = BulletRecord.prototype;
+            if(!$scope.projectNames.includes($scope.userData[i].project)){
+                $scope.projectNames.push($scope.userData[i].project);
+            }
+        }
+        $scope.projectNames.sort();
+    }).catch(function (error) {
+        console.log("Error:", error);
+    });
+    $scope.userArchive.$loaded().then(function (result) {
+        for (var i = 0; i < $scope.userArchive.length; i++) {
+            $scope.userArchive[i].__proto__ = BulletRecord.prototype;
         }
     }).catch(function (error) {
         console.log("Error:", error);
@@ -107,9 +137,18 @@ app.controller('myController', ['$scope', '$firebaseArray', '$interval', 'Auth',
             priority: 3
         }, 
     ];
-    $scope.createNewBullet = function() {
+    $scope.selectFilter = function(project) {
+        if (project === " NONE") {
+            $scope.myprojectfilter = "";
+        } else {
+            $scope.myprojectfilter = project;
+        }
+    }
+    $scope.createNewBullet = function(project) {
         $scope.userData.$add(new BulletRecord()).then(function(ref) {
             $scope.userData[$scope.userData.$indexFor(ref.key)].__proto__ = BulletRecord.prototype;
+            $scope.userData[$scope.userData.$indexFor(ref.key)].project = project;
+            $scope.projectNames.push(project);
         });
         return false;
     }
@@ -118,6 +157,7 @@ app.controller('myController', ['$scope', '$firebaseArray', '$interval', 'Auth',
         return false;
     }
     $scope.deleteBullet = function(bullet) {
+       
         $scope.userData.$remove(bullet);
         return false;
     }
@@ -132,8 +172,8 @@ app.controller('myController', ['$scope', '$firebaseArray', '$interval', 'Auth',
 
 function BulletRecord() {
     this.description = '';
-    this.priority = 4;
-    this.priorityLabel = 'Due Today';
+    this.priority = 2;
+    this.priorityLabel = '';
     this.project = '';
     this.complete = false;
     this.timestamp = '';
@@ -154,7 +194,6 @@ BulletRecord.prototype.priorityEdit = function(priority) {
 BulletRecord.prototype.newTimeStamp = function() {
     this.timeCompleted = new Date().getTime();
     this.dateCompleted = new Date(this.timeCompleted);
-    console.log(Date.now());
     var doubledigitFormat = function(measure){
         if (measure < 10){
             return "0" + measure;

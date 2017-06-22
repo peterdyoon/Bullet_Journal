@@ -12,3 +12,8 @@
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
 }
+#fixed-position {
+    position: fixed;
+    top: 5%;
+    left: 50%;
+}
